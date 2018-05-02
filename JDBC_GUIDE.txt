@@ -1,0 +1,188 @@
+Java JDBC Tutorial
+Before JDBC, ODBC API was the database API to connect and execute query with the database. 
+But, ODBC API uses ODBC driver which is written in C language (i.e. platform dependent and unsecured). 
+That is why Java has defined its own API (JDBC API) that uses JDBC drivers (written in Java language).
+
+---------------------------- There are 5 steps   
+1 -  register the OracleDriver class
+Class.forName("oracle.jdbc.driver.OracleDriver");  
+2 - Create the connection object
+Connection con=DriverManager.getConnection(  
+"jdbc:oracle:thin:@localhost:1521:xe","system","password");  
+3- Create the Statement object
+The createStatement() method of Connection interface is used to create statement. 
+The object of statement is responsible to execute queries with the database.
+Statement stmt=con.createStatement();  
+4 - Execute the query
+The executeQuery() method of Statement interface is used to execute queries to the database. 
+This method returns the object of ResultSet that can be used to get all the records of a table.
+ResultSet rs=stmt.executeQuery("select * from emp");  
+5 - Close the connection object
+----------------------------
+DriverManager class
+The DriverManager class acts as an interface between user and drivers. 
+It keeps track of the drivers that are available and handles establishing a connection between a database and the appropriate driver. 
+The DriverManager class maintains a list of Driver classes that have registered themselves by calling the method DriverManager.registerDriver().
+Useful methods of DriverManager class
+Method	Description
+1) public static void registerDriver(Driver driver):	is used to register the given driver with DriverManager.
+2) public static void deregisterDriver(Driver driver):	is used to deregister the given driver (drop the driver from the list) with DriverManager.
+3) public static Connection getConnection(String url):	is used to establish the connection with the specified url.
+4) public static Connection getConnection(String url,String userName,String password):	is used to establish the connection with the specified url, username and password.
+----------------------------------
+Connection interface
+A Connection is the session between java application and database. 
+The Connection interface is a factory of Statement, PreparedStatement, 
+and DatabaseMetaData i.e. object of Connection can be used to get the object of Statement and DatabaseMetaData. 
+The Connection interface provide many methods for transaction management like commit(), rollback() etc.
+------------------------------
+Statement interface
+The Statement interface provides methods to execute queries with the database. 
+The statement interface is a factory of ResultSet i.e. it provides factory method to get the object of ResultSet.
+Commonly used methods of Statement interface:
+The important methods of Statement interface are as follows:
+1) public ResultSet executeQuery(String sql): is used to execute SELECT query. It returns the object of ResultSet.
+2) public int executeUpdate(String sql): is used to execute specified query, it may be create, drop, insert, update, delete etc.
+3) public boolean execute(String sql): is used to execute queries that may return multiple results.
+4) public int[] executeBatch(): is used to execute batch of commands.
+----------------------------------
+ResultSet interface
+The object of ResultSet maintains a cursor pointing to a row of a table. Initially, cursor points to before the first row.
+But we can make this object to move forward and backward direction by passing either TYPE_SCROLL_INSENSITIVE or TYPE_SCROLL_SENSITIVE in createStatement(int,int) method as well as we can make this object as updatable by:
+Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,  
+                     ResultSet.CONCUR_UPDATABLE);  
+Commonly used methods of ResultSet interface
+1) public boolean next():	is used to move the cursor to the one row next from the current position.
+2) public boolean previous():	is used to move the cursor to the one row previous from the current position.
+3) public boolean first():	is used to move the cursor to the first row in result set object.
+4) public boolean last():	is used to move the cursor to the last row in result set object.
+5) public boolean absolute(int row):	is used to move the cursor to the specified row number in the ResultSet object.
+6) public boolean relative(int row):	is used to move the cursor to the relative row number in the ResultSet object, it may be positive or negative.
+7) public int getInt(int columnIndex):	is used to return the data of specified column index of the current row as int.
+8) public int getInt(String columnName):	is used to return the data of specified column name of the current row as int.
+9) public String getString(int columnIndex):	is used to return the data of specified column index of the current row as String.
+10) public String getString(String columnName):	is used to re
+-------------------------------------------------
+PreparedStatement interface for secuirity from Sql Injection
+The PreparedStatement interface is a subinterface of Statement. It is used to execute parameterized query.
+String sql="insert into emp values(?,?,?)";  
+As you can see, we are passing parameter (?) for the values. Its value will be set by calling the setter methods of PreparedStatement.
+Why use PreparedStatement?
+Improves performance: The performance of the application will be faster if you use PreparedStatement interface because query is compiled only once.
+Methods of PreparedStatement interface
+The important methods of PreparedStatement interface are given below:
+Method	Description
+public void setInt(int paramIndex, int value)	sets the integer value to the given parameter index.
+public void setString(int paramIndex, String value)	sets the String value to the given parameter index.
+public void setFloat(int paramIndex, float value)	sets the float value to the given parameter index.
+public void setDouble(int paramIndex, double value)	sets the double value to the given parameter index.
+public int executeUpdate()	executes the query. It is used for create, drop, insert, update, delete etc.
+public ResultSet executeQuery()	executes the select query. It returns an instance of ResultSet
+-----------------------------------------------------
+Java ResultSetMetaData Interface
+The metadata means data about data i.e. we can get further information from the data.
+If you have to get metadata of a table like total number of column, column name, column type etc. 
+,ResultSetMetaData interface is useful because it provides methods to get metadata from the ResultSet object.
+Commonly used methods of ResultSetMetaData interface
+
+Method	Description
+public int getColumnCount()throws SQLException          	it returns the total number of columns in the ResultSet object.
+public String getColumnName(int index)throws SQLException	it returns the column name of the specified column index.
+public String getColumnTypeName(int index)throws SQLException	it returns the column type name for the specified index.
+public String getTableName(int index)throws SQLException	it returns the table name for the specified column index.
+
+------------------------------------------
+Java DatabaseMetaData interface
+DatabaseMetaData interface provides methods to get meta data of a database such as database product name, 
+database product version, driver name, name of total number of tables, name of total number of views etc.
+
+Commonly used methods of DatabaseMetaData interface
+public String getDriverName()throws SQLException: it returns the name of the JDBC driver.
+public String getDriverVersion()throws SQLException: it returns the version number of the JDBC driver.
+public String getUserName()throws SQLException: it returns the username of the database.
+public String getDatabaseProductName()throws SQLException: it returns the product name of the database.
+public String getDatabaseProductVersion()throws SQLException: it returns the product version of the database.
+public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types)throws SQLException: it returns the description of the tables of the specified catalog. The table type can be TABLE, VIEW, ALIAS, SYSTEM TABLE, SYNONYM etc.
+------
+Transaction Management in JDBC
+Transaction represents a single unit of work. (Single tone )
+Method	                                    Description
+void setAutoCommit(boolean status)	It is true bydefault means each transaction is committed bydefault.
+void commit()	commits the transaction.
+void rollback()	cancels the transaction.
+----------------------------------------------
+Batch Processing in JDBC
+Instead of executing a single query, we can execute a batch (group) of queries. It makes the performance fast.
+The java.sql.Statement and java.sql.PreparedStatement interfaces provide methods for batch processing.
+Method	                     Description
+void addBatch(String query)	 It adds query into batch.
+int[] executeBatch()	     It executes the batch of queries.
+
+Example of batch processing in jdbc
+Let's see the simple example of batch processing in jdbc. It follows following steps:
+Load the driver class
+Create Connection
+Create Statement
+Add query in the batch
+Execute Batch
+Close Connection
+
+Class.forName("oracle.jdbc.driver.OracleDriver");  
+Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","system","oracle");  
+con.setAutoCommit(false);  
+Statement stmt=con.createStatement();  
+stmt.addBatch("insert into user420 values(190,'abhi',40000)");  
+stmt.addBatch("insert into user420 values(191,'umesh',50000)");  
+stmt.executeBatch();//executing the batch  
+con.commit();  
+con.close();
+
+---------------------
+JDBC RowSet
+
+The instance of RowSet is the java bean component because it has properties and java bean notification mechanism. It is introduced since JDK 5.
+It is the wrapper of ResultSet. It holds tabular data like ResultSet but it is easy and flexible to use.
+The implementation classes of RowSet interface are as follows:
+JdbcRowSet
+CachedRowSet
+WebRowSet
+JoinRowSet
+FilteredRowSet
+Let's see how to create and execute RowSet.
+JdbcRowSet rowSet = RowSetProvider.newFactory().createJdbcRowSet();  
+rowSet.setUrl("jdbc:oracle:thin:@localhost:1521:xe");  
+rowSet.setUsername("system");  
+rowSet.setPassword("oracle");  
+rowSet.setCommand("select * from emp400");  
+rowSet.execute();  
+---------------------
+Jdbc New Features
+
+The latest version of JDBC is 4.0 currently. Java has updated jdbc api to ease and simplify the coding to database interactivity.
+
+Here, we are going to see the features included in Jdbc 3.0 and Jdbc 4.0.
+
+Jdbc 3.0 Features
+
+The important features of JDBC API 3.0 are as follows:
+
+Jdbc RowSet We have done the great discussion on JdbcRowSet in the previous page.
+Savepoint in transaction management Now you are able to create, rollback and release the savepoint by Connection.setSavepoint(), Connection.rollback(Savepoint svpt) and Connection.releaseSavepoint(Savepoint svpt) methods.
+Statement and ResultSet Caching for Connection Pooling Now you are able to reuse the statement and result set because jdbc 3 provides you the facility of statement caching and result set caching.
+Switching between Global and Local Transactions
+Retrieval of auto generated keys Now you are able to get the auto generated keys by the method getGeneratedKeys().
+Jdbc 4.0 Features
+The important features of JDBC API 4.0 are given below:
+Automatic Loading of Driver class You don't need to write Class.forName() now because it is loaded bydefault since jdbc4.
+Subclasses of SQLException Jdbc 4 provides new subclasses of SQLException class for better readability and handling.
+New methods There are many new methods introduced in Connection, PreparedStatement, CallableStatement, ResultSet etc.
+Improved DataSource Now data source implementation is improved.
+Event Handling support in Statement for Connection Pooling Now Connection Pooling can listen statement error and statement closing events.
+
+
+
+
+
+
+
+
